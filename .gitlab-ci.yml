@@ -1,0 +1,85 @@
+variables:
+  BUILD_IMAGE: "$CI_REGISTRY_IMAGE/buildah/stable"
+  BASE_IMAGE: "$CI_REGISTRY_IMAGE/base"
+
+stages:
+  - Build
+  - Checks
+  - Docs
+
+BuildDockerImage:
+  stage: Build
+  image:
+    name: "$BUILD_IMAGE"
+  variables:
+    STORAGE_DRIVER: vfs
+    BUILDAH_FORMAT: docker
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | buildah login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+  script:
+    - buildah bud --tag "${BASE_IMAGE}:${CI_COMMIT_SHA}" --file "${CI_PROJECT_DIR}/Dockerfile" "${CI_PROJECT_DIR}"
+    - buildah push "${BASE_IMAGE}:${CI_COMMIT_SHA}"
+
+
+BuildDocumentation:
+  stage: Docs
+  image: "${BASE_IMAGE}:${CI_COMMIT_SHA}"
+  script:
+    - uv run mkdocs build -s -d docs_html/
+    - (cd docs_html && zip -r ../docs_html.zip .)
+    # Add deploy step here later
+  artifacts:
+      name: "html_docs"
+      paths:
+        - docs_html.zip
+  needs:
+    - job: BuildDockerImage
+
+
+Lint:
+  stage: Checks
+  image: "${BASE_IMAGE}:${CI_COMMIT_SHA}"
+  script:
+    - uv run ruff check --output-format=gitlab > code-quality-report.json
+  artifacts:
+    name: "code_quality_report"
+    reports:
+      codequality: code-quality-report.json
+
+Formatting:
+  stage: Checks
+  image: "${BASE_IMAGE}:${CI_COMMIT_SHA}"
+  script:
+    - uv run ruff format --diff .
+
+Typecheck:
+  stage: Checks
+  image: "${BASE_IMAGE}:${CI_COMMIT_SHA}"
+  script:
+    - uv run ty check .
+
+Test:
+  stage: Checks
+  image: "${BASE_IMAGE}:${CI_COMMIT_SHA}"
+  script:
+    - uv run pytest --junitxml=report.xml
+  artifacts:
+    name: "test_results"
+    when: always
+    reports:
+      junit: report.xml
+    paths:
+      - report.xml
+
+PackagesVulnerability:
+  stage: Checks
+  image: "${BASE_IMAGE}:${CI_COMMIT_SHA}"
+  script:
+    - uv-secure
+
+CodeQualityThreshold:
+  stage: Checks
+  image: "${BASE_IMAGE}:${CI_COMMIT_SHA}"
+  script:
+    - uv run xenon . --max-absolute A --max-modules A --max-average A
+  allow_failure: true

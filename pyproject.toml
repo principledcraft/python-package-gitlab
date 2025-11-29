@@ -1,0 +1,63 @@
+[project]
+name = "myapp"
+version = "0.1.0"
+description = "My application"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.format]
+
+[tool.ruff.lint]
+select = [
+  "E","F","B","C90","I","UP","SIM","PL","PT","TID","PERF",
+  "D","N","S","ARG","ERA","RUF","T10","T20","FURB","ISC",
+  "ANN"
+]
+ignore = [
+  "ANN204", # no return type for special methods
+  "ANN401", # allow Any sparingly
+  "D203",   # disable conflicting docstring rules
+  "D212",   # disable conflicting docstring rules
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 8
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.isort]
+known-first-party = ["myapp"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = [
+  "ANN",     # relax type annotation rules
+  "T20",     # allow print()
+  "S101",    # allow assert
+  "PLR2004"  # allow magic values
+]
+"src/**/_*.py" = ["ANN"]
+
+[tool.ruff.lint.flake8-annotations]
+allow-star-arg-any = true
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+    "radon>=6.0.1",
+    "ruff>=0.13.2",
+    "ty>=0.0.1a21",
+    "xenon>=0.9.3",
+    "mkdocs-material>=9.6.20",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/myapp"]
