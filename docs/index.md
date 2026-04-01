@@ -1,17 +1,19 @@
-# Welcome to MkDocs
+# myapp
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+_One-line description of what this application does._
 
-## Commands
+## Overview
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+_Describe the purpose and scope of the application. What problem does it solve? Who uses it?_
 
-## Project layout
+## How it works
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+_Explain the core concepts and architecture. Focus on the why — decisions made, trade-offs considered, and the mental model a developer needs to work effectively with this codebase._
+
+## Key concepts
+
+_Define domain terms and concepts central to this application._
+
+| Term | Description |
+|------|-------------|
+| _term_ | _definition_ |

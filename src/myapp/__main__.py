@@ -1,9 +1,11 @@
 """Main module entry point."""
 
+import sys
+
 
 def main() -> None:
     """Run the application."""
-    print("Hello, World!")
+    sys.stdout.write("Hello, World!\n")
 
 
 if __name__ == "__main__":
